@@ -7,6 +7,7 @@ export class NotebookSync {
   async start(cached) {
     this.pending = cached?.pending || null;
     this.revision = cached?.revision || 0;
+    if (this.pending) this.apply(structuredClone(this.pending));
     const remote = await this.read();
     if (this.pending && remote.revision !== this.revision) {
       this.conflict = true; this.status('conflict');
