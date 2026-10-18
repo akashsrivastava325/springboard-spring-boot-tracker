@@ -10,12 +10,15 @@ A mobile-friendly interview notebook with 204 questions in 20 prerequisite-led s
 - Complete and Skim notes can be entered directly while adding an item.
 - Search across questions and notes; filter by section, source, or progress.
 - Automatic browser-local saving, validated JSON backup export/import, and printing.
+- Comfortable 16px answer typography with neutral colors, spacious paragraphs, Markdown tables, and code blocks in all answer views and previews.
+- Paste Markdown from ChatGPT’s Copy button, or paste selected formatted text to convert headings, lists, tables, and code into editable Markdown. Custom ChatGPT visual widgets are not portable Markdown and may paste as text.
+- Visible Delete buttons for all personal questions and notes, including prerequisites, with confirmation and a 15-second Undo that restores notes and position.
 
 ## Publish on GitHub Pages
 
 In this repository, open **Settings → Pages**. Under **Build and deployment**, choose **Deploy from a branch**, select **main** and **/(root)**, and click **Save**. GitHub then builds the site.
 
-The site has no build step. Publish `index.html`, `firebase-config.js`, `firebase-sync.mjs`, and `sync-engine.mjs` together. Firebase SDK modules load from Google’s CDN only when configured.
+The site has no build step. Publish `index.html`, `firebase-config.js`, `firebase-sync.mjs`, `sync-engine.mjs`, `answer-style.css`, and `paste-markdown.js` together. Firebase SDK modules load from Google’s CDN only when configured.
 
 ## Account sync with Firebase
 
@@ -48,3 +51,5 @@ Run `node --test tests/sync.test.mjs` for cross-device saving, revision conflict
 ## Curriculum
 
 Questions are adapted from CodingShuttle, GeeksforGeeks, and InterviewBit, with added Foundation questions. Source links appear in the tracker. Learn version-specific APIs against your chosen Spring Boot version.
+
+For reader and deletion checks, serve an isolated local copy with `window.SPRINGBOARD_FIREBASE_CONFIG = {};` and open `tests/reader-browser.html`. The 12 browser checks cover clipboard conversion, code whitespace, unsafe HTML stripping, editor paste saving, prerequisite deletion, cancellation, Undo, protected seed items, both revision views, and answer typography. This harness refuses to run on production hosts.
