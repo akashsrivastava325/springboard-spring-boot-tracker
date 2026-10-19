@@ -9,7 +9,7 @@
 .commentlist{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:18px}
 .commententry{display:flex;align-items:flex-start;gap:9px;min-width:0}.commentavatar{background:#e7eef9;color:#2263b5;width:35px;height:35px;flex:0 0 35px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:700}
 .commentbody{min-width:0;max-width:100%}.commentbubble{display:inline-block;background:#f0f2f5;border-radius:18px;padding:10px 14px;max-width:100%}
-.commentauthor{display:block;font-size:13px;font-weight:700;color:#202124}.commentbubble p{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.6;margin:3px 0 0;color:#242526}
+.commentauthor{display:block;font-size:13px;font-weight:700;color:#202124}.commentmarkdown{margin-top:6px}.commentbody{flex:1}.commentbubble{min-width:0}.commentmarkdown.markdown-content{font-size:16px;line-height:1.75}.commentmarkdown>:last-child{margin-bottom:0}
 .commenttime{display:block;font-size:11px;color:#74787e;margin:5px 0 0 12px}
 .commentempty{font-size:14px;color:#70757d;text-align:center;background:#f8f9fb;border:1px dashed #dce0e6;border-radius:12px;padding:28px 16px}
 .commentform{margin-top:22px;border-top:1px solid #e6e8eb;padding-top:18px}.commentcomposer{display:flex;gap:10px;align-items:flex-start}
@@ -19,5 +19,8 @@
 #postComment,#newComment{background:#1877f2;border-color:#1877f2;color:#fff}#postComment:hover,#newComment:hover{background:#1464ce}
 #commentStatus{font-size:12px;color:#596776;line-height:1.6;margin:14px 0 0;overflow-wrap:anywhere}
 #commentForm[hidden],#commentGuest[hidden],#commentsEmpty[hidden],#newComment[hidden]{display:none}
-@media(max-width:760px){#commentsDialog{max-height:94dvh}.commentsbutton{min-height:38px;font-size:11px}.commentformfoot{margin-left:0}.commentformfoot span{max-width:140px}#commentText{font-size:16px}.commentbubble p{font-size:15px}}
+@media(max-width:760px){#commentsDialog{max-height:94dvh}.commentsbutton{min-height:38px;font-size:11px}.commentformfoot{margin-left:0}.commentformfoot span{max-width:140px}#commentText{font-size:16px}.commentmarkdown.markdown-content{font-size:16px}}
 @media print{.commentsbutton{display:none!important}}
+
+#commentText[hidden],#commentPreviewBody[hidden]{display:none}
+#commentPreviewBody{min-height:95px;padding:16px}.commentinputwrap .displaytabs{margin:8px 0 10px}

@@ -57,7 +57,7 @@ For reader and deletion checks, serve an isolated local copy with `window.SPRING
 
 ## Private question comments
 
-Open **Comments** beside a question, sign in, and use **New comment** or the composer at the bottom. Each comment shows its author and full local date/time. Comments appear on your other devices when signed into the same account. Threads are private; the Facebook-style appearance does not make them public. Comments are plain text and support up to 5,000 characters.
+Open **Comments** beside a question, sign in, and use **New comment** or the composer at the bottom. Each comment shows its author and full local date/time. Comments appear on your other devices when signed into the same account. Threads are private; the Facebook-style appearance does not make them public. Comments store their Markdown source and support up to 5,000 characters. Posted comments and the composer Preview use the same sanitized Markdown renderer and 16px typography as notes, including headings, emphasis, lists, tables, links, and fenced code. Formatted clipboard text converts to Markdown just as it does in the notes editor. Existing comments render as Markdown without changing their stored content.
 
 Comments are append-only documents under `users/{uid}/questionComments/{commentId}`. Existing notebook records and their schema are unchanged. Creating or reading a comment never calls the notebook saving code. The added Firestore rule permits only the account owner to read/create comments and denies updates and deletion of comments. No migration, record replacement, database cleanup, or cascade deletion is performed. Notebook import/export does not modify or include these separate comments.
 
