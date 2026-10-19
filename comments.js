@@ -30,7 +30,7 @@
       const body=document.createElement('div');body.className='commentbody';
       const bubble=document.createElement('div');bubble.className='commentbubble';
       const author=document.createElement('strong');author.className='commentauthor';author.textContent=item.authorName || 'You';
-      const text=document.createElement('p');text.textContent=item.text;
+      const text=document.createElement('div');text.className='commentmarkdown markdown-content';text.innerHTML=window.notebookApp.renderMarkdown(item.text);
       bubble.append(author,text);
       const time=document.createElement('time');time.className='commenttime';
       if(Number.isFinite(item.createdAt)){
@@ -40,6 +40,20 @@
       body.append(bubble,time);entry.append(avatar,body);list.append(entry);
     }
   }
+  function preview(show){
+    $('commentText').hidden=show;$('commentPreviewBody').hidden=!show;
+    $('commentWrite').classList.toggle('active',!show);$('commentWrite').setAttribute('aria-pressed',String(!show));
+    $('commentPreview').classList.toggle('active',show);$('commentPreview').setAttribute('aria-pressed',String(show));
+    if(show){const text=$('commentText').value;$('commentPreviewBody').innerHTML=text.trim()?window.notebookApp.renderMarkdown(text):'<p class="emptynote">Nothing to preview yet. Write or paste a comment first.</p>';}
+  }
+  $('commentWrite').addEventListener('click',()=>preview(false));
+  $('commentPreview').addEventListener('click',()=>preview(true));
+  $('commentText').addEventListener('paste',event=>{
+    const clipboard=event.clipboardData;if(!clipboard||!window.SpringboardPaste)return;
+    const plain=clipboard.getData('text/plain'),html=clipboard.getData('text/html');if(!html)return;
+    const converted=window.SpringboardPaste.choose(plain,html);if(converted===plain)return;
+    event.preventDefault();$('commentText').setRangeText(converted,$('commentText').selectionStart,$('commentText').selectionEnd,'end');$('commentText').dispatchEvent(new Event('input',{bubbles:true}));
+  });
   function connect(){
     stop();render([]);message('');
     $('commentGuest').hidden=!!account;$('commentForm').hidden=!account;$('newComment').hidden=!account;
@@ -47,7 +61,7 @@
     if(!account||!store){$('commentsCount').textContent='Private to your account';return;}
     const current=epoch,uid=account.uid,id=questionId;
     $('commentAvatar').textContent=account.name.slice(0,1).toUpperCase();
-    $('commentText').value=draft().text;posting=pending.has(key(uid,id));$('postComment').disabled=posting;$('commentText').disabled=posting;
+    $('commentText').value=draft().text;preview(false);posting=pending.has(key(uid,id));$('postComment').disabled=posting;$('commentText').disabled=posting;
     message('Loading comments…');
     unsubscribe=store.subscribe(id,(items,fromCache)=>{
       if(epoch!==current||account?.uid!==uid||questionId!==id)return;
@@ -63,7 +77,7 @@
     const button=event.target.closest('[data-comments]');if(button)open(button.dataset.comments);
   });
   $('commentText').addEventListener('input',()=>{const value=draft();if(value)remember({...value,id:value.attempted?crypto.randomUUID():value.id,attempted:false,text:$('commentText').value});});
-  $('newComment').addEventListener('click',()=>{$('commentText').focus();$('commentText').scrollIntoView({block:'nearest',behavior:'smooth'});});
+  $('newComment').addEventListener('click',()=>{preview(false);$('commentText').focus();$('commentText').scrollIntoView({block:'nearest',behavior:'smooth'});});
   $('commentsSignIn').addEventListener('click',()=>{dialog.close();window.notebookApp.openAccount();});
   dialog.addEventListener('close',()=>{if(dialog.open)return;stop();questionId=null;});
   $('commentForm').addEventListener('submit',async event=>{
@@ -81,7 +95,7 @@
       // Clear only the submitted draft; a draft edited in another thread/account is kept.
       const k=key(uid,id),stored=drafts.get(k);
       if(stored?.id===value.id && stored.text===value.text)remember({id:crypto.randomUUID(),text:''},uid,id);
-      if(active()){$('commentText').value='';message('Comment posted.');}
+      if(active()){$('commentText').value='';preview(false);message('Comment posted.');}
     }catch(error){if(active())message('Not posted. Your draft is kept. '+(error.code==='permission-denied'?'Please check your account access.':'Check your connection, then try Post comment again.'));}
     finally{clearTimeout(slow);pending.delete(key(uid,id));if(active()){posting=false;$('postComment').disabled=false;$('commentText').disabled=false;}}
   });
