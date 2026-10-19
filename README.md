@@ -12,13 +12,14 @@ A mobile-friendly interview notebook with 204 questions in 20 prerequisite-led s
 - Automatic browser-local saving, validated JSON backup export/import, and printing.
 - Comfortable 16px answer typography with neutral colors, spacious paragraphs, Markdown tables, and code blocks in all answer views and previews.
 - Paste Markdown from ChatGPT’s Copy button, or paste selected formatted text to convert headings, lists, tables, and code into editable Markdown. Custom ChatGPT visual widgets are not portable Markdown and may paste as text.
+- Comments buttons on every question and personal note, with private per-account threads, timestamped bubbles, and a new-comment composer.
 - Visible Delete buttons for all personal questions and notes, including prerequisites, with confirmation and a 15-second Undo that restores notes and position.
 
 ## Publish on GitHub Pages
 
 In this repository, open **Settings → Pages**. Under **Build and deployment**, choose **Deploy from a branch**, select **main** and **/(root)**, and click **Save**. GitHub then builds the site.
 
-The site has no build step. Publish `index.html`, `firebase-config.js`, `firebase-sync.mjs`, `sync-engine.mjs`, `answer-style.css`, and `paste-markdown.js` together. Firebase SDK modules load from Google’s CDN only when configured.
+The site has no build step. Publish `index.html`, `firebase-config.js`, `firebase-sync.mjs`, `sync-engine.mjs`, `answer-style.css`, `paste-markdown.js`, `comments.js`, `comments.css`, and `comments-store.mjs` together. Firebase SDK modules load from Google’s CDN only when configured.
 
 ## Account sync with Firebase
 
@@ -53,3 +54,13 @@ Run `node --test tests/sync.test.mjs` for cross-device saving, revision conflict
 Questions are adapted from CodingShuttle, GeeksforGeeks, and InterviewBit, with added Foundation questions. Source links appear in the tracker. Learn version-specific APIs against your chosen Spring Boot version.
 
 For reader and deletion checks, serve an isolated local copy with `window.SPRINGBOARD_FIREBASE_CONFIG = {};` and open `tests/reader-browser.html`. The 12 browser checks cover clipboard conversion, code whitespace, unsafe HTML stripping, editor paste saving, prerequisite deletion, cancellation, Undo, protected seed items, both revision views, and answer typography. This harness refuses to run on production hosts.
+
+## Private question comments
+
+Open **Comments** beside a question, sign in, and use **New comment** or the composer at the bottom. Each comment shows its author and full local date/time. Comments appear on your other devices when signed into the same account. Threads are private; the Facebook-style appearance does not make them public. Comments are plain text and support up to 5,000 characters.
+
+Comments are append-only documents under `users/{uid}/questionComments/{commentId}`. Existing notebook records and their schema are unchanged. Creating or reading a comment never calls the notebook saving code. The added Firestore rule permits only the account owner to read/create comments and denies updates and deletion of comments. No migration, record replacement, database cleanup, or cascade deletion is performed. Notebook import/export does not modify or include these separate comments.
+
+Timestamp values come from Firestore server timestamps. Comment IDs remain stable for retries to avoid duplicate posts. A failed post keeps an account- and question-specific local draft. New posts require a working connection; the interface reports failures and offers retry through the Post comment button.
+
+Run `node --test tests/sync.test.mjs tests/comments-store.test.mjs` for data-preservation, retry idempotency, account isolation, validation, sorting, and existing sync checks. In an isolated local preview with Firebase disabled, open `tests/comments-browser.html` for the comments UI checks. No production records are used or modified by these tests.
