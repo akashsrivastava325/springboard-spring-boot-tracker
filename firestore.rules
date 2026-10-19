@@ -15,5 +15,18 @@ service cloud.firestore {
         && request.resource.data.revision == resource.data.revision + 1;
       allow delete: if owner();
     }
+    // Append-only comments are separate from existing notebook documents.
+    match /users/{uid}/questionComments/{commentId} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['questionId', 'text', 'authorName', 'createdAt'])
+        && request.resource.data.questionId is string
+        && request.resource.data.questionId.matches('q[0-9]{3}|custom-[A-Za-z0-9_-]{1,100}')
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 5000
+        && request.resource.data.authorName is string && request.resource.data.authorName.size() <= 80
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
   }
 }

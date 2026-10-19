@@ -1,4 +1,5 @@
 import {NotebookSync} from './sync-engine.mjs';
+import {createCommentStore} from './comments-store.mjs';
 const $ = id => document.getElementById(id);
 const app = window.notebookApp;
 let engine, auth, sdk, user, timer, busy = false;
@@ -52,6 +53,7 @@ async function setup() {
   $('accountBtn').addEventListener('click',()=>{app.openAccount();$('accountMessage').textContent='';});
   sdk.onAuthStateChanged(auth,async current=>{
     clearTimeout(timer);engine=null;user=current;window.accountSyncActive=!!current;
+    window.SpringboardComments?.setAccount(current?{uid:current.uid,name:(current.displayName||current.email?.split('@')[0]||'You').slice(0,80)}:null,current?createCommentStore({firestore,db,uid:current.uid}):null);
     app.switchAccount(current?.uid);
     $('accountBtn').hidden=!!current;$('signOutBtn').hidden=!current;
     $('migrateGuest').hidden=true;$('syncConflict').hidden=true;$('retrySync').hidden=true;
